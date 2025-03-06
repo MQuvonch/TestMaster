@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using TestExecution.Data.IRepositories;
 using TestExecution.Domain.Entities;
+using TestExecution.Service.DTOs.Option;
+using TestExecution.Service.DTOs.Question;
+using TestExecution.Service.DTOs.Test;
 using TestExecution.Service.DTOs.User;
 using TestExecution.Service.Exceptions;
 using TestExecution.Service.Helpers;
@@ -21,7 +24,7 @@ public class UserService : IUserService
 
     public async Task<UserForResultDto> RegistrAsync(RegistrForCreationDto dto)
     {
-        var users = await _repository.GetAllAsync();
+        var users = _repository.GetAll();
         var filtereUser = users.Where(u => u.Email == dto.Email).FirstOrDefault();
         if (filtereUser != null)
         {
@@ -48,10 +51,34 @@ public class UserService : IUserService
 
     public async Task<IEnumerable<UserForResultDto>> GetAllAsync()
     {
-        var users = await _repository.GetAllAsync();
-        if (users is null)
-            throw new TestCustomException(404, "User mavjud emas");
-        return _mapper.Map<IEnumerable<UserForResultDto>>(users);
+        var users = _repository.GetAll().Select(u=>new UserForResultDto
+        {
+            Id = u.Id,
+            FirstName = u.FirstName,
+            LastName = u.LastName,
+            Email = u.Email,
+            UserName = u.UserName,
+            PasswordHash = u.PasswordHash,
+            Tests = u.Tests.Select(t=> new TestForResultDto
+            {
+                Id=t.Id,
+                Title = t.Title,    
+                Description = t.Description,
+                Duration = t.Duration,
+                Questions = t.Questions.Select(q=>new QuestionFromResultDto
+                {
+                    Id=q.Id,    
+                    Text=q.Text,    
+                    Options = q.Options.Select(o=> new OptionFromResultDto
+                    {
+                        QuestionId=o.Id,
+                        Text = o.Text,
+                        IsCorrect=o.IsCorrect,
+                    }).ToList()
+                }).ToList() 
+            }).ToList()
+        });
+        return users ?? throw new TestCustomException(404, "User mavjud emas"); ;
     }
 
     public async Task<UserForResultDto> GetByIdAsync(Guid Id)

@@ -8,5 +8,5 @@ public class Question : Auditable
     public Test Test { get; set; }
     public string Text {  get; set; }
 
-    public ICollection<Option> OPtions { get; set; }
+    public ICollection<Option> Options { get; set; }
 }

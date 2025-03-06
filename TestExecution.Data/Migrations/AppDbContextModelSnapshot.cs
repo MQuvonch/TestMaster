@@ -230,6 +230,9 @@ namespace TestExecution.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("RightAnswersCount")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -254,7 +257,7 @@ namespace TestExecution.Data.Migrations
             modelBuilder.Entity("TestExecution.Domain.Entities.Option", b =>
                 {
                     b.HasOne("TestExecution.Domain.Entities.Question", "Question")
-                        .WithMany("OPtions")
+                        .WithMany("Options")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
@@ -332,7 +335,7 @@ namespace TestExecution.Data.Migrations
 
             modelBuilder.Entity("TestExecution.Domain.Entities.Question", b =>
                 {
-                    b.Navigation("OPtions");
+                    b.Navigation("Options");
                 });
 
             modelBuilder.Entity("TestExecution.Domain.Entities.Test", b =>

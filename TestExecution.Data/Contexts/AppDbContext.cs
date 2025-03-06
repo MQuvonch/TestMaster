@@ -42,7 +42,7 @@ namespace TestExecution.Data.Contexts
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Question>()
-                .HasMany(x => x.OPtions)
+                .HasMany(x => x.Options)
                 .WithOne(t => t.Question)
                 .OnDelete(DeleteBehavior.SetNull);
 

@@ -1,35 +1,22 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TestExecution.Api.Models;
+using TestExecution.Service.DTOs.UserAnswer;
 using TestExecution.Service.DTOs.UserAttempt;
 using TestExecution.Service.Interfaces;
 
 namespace TestExecution.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize]
-    public class UserAttemptController : ControllerBase
+    public class UserAnswerController : ControllerBase
     {
-        private readonly IUserAttemptService _userAttemptService;
+        private readonly IUserAnswerService _answerService;
 
-        public UserAttemptController(IUserAttemptService userAttemptService)
+        public UserAnswerController(IUserAnswerService answerService)
         {
-            _userAttemptService = userAttemptService;
+            _answerService = answerService;
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdAsync(Guid id)
-        {
-            var response = new Response()
-            {
-                StatusCode = 200,
-                Message = "Success",
-                Date = await _userAttemptService.GetByIdAsync(id)
-            };
-            return Ok(response);
-        }
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {
@@ -37,31 +24,43 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _userAttemptService.GetAllAsync()
+                Date = await _answerService.GetAllAsync()
+            };
+            return Ok(response);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var response = new Response()
+            {
+                StatusCode = 200,
+                Message = "Success",
+                Date = await _answerService.GetByIdAsync(id)
             };
             return Ok(response);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] UserAttemptFromCreateDto dto)
+        public async Task<IActionResult> CreateAsync(UserAnswerFromCreateDto dto)
         {
             var response = new Response()
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _userAttemptService.FinishTest(dto)
+                Date = await _answerService.CreateAsync(dto)
             };
             return Ok(response);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(Guid id,[FromBody] UserAttemptFromUpdateDto dto)
+        public async Task<IActionResult> UpdateAsync(Guid id, UserAnswerFromUpdateDto dto)
         {
             var response = new Response()
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _userAttemptService.UpdateAsync(id, dto)
+                Date = await _answerService.UpdateAsync(id, dto)
             };
             return Ok(response);
         }
@@ -73,9 +72,11 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _userAttemptService.DeleteAsync(id)
+                Date = await _answerService.DeleteAsync(id)
             };
             return Ok(response);
         }
-    }   
+
+
+    }
 }

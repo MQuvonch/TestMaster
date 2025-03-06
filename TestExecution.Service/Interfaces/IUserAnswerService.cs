@@ -15,7 +15,5 @@ namespace TestExecution.Service.Interfaces
         Task<UserAnswerFromResultDto> CreateAsync(UserAnswerFromCreateDto dto);
         Task<UserAnswerFromResultDto> UpdateAsync(Guid Id,  UserAnswerFromUpdateDto dto);
         Task<bool> DeleteAsync(Guid Id);
-
-        Task<string> FinishTest(SubmitTestCreationDto dto);
     } 
 }

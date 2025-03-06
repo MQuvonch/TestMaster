@@ -1,4 +1,6 @@
-﻿namespace TestExecution.Service.DTOs.User;
+﻿using TestExecution.Service.DTOs.Test;
+
+namespace TestExecution.Service.DTOs.User;
 
 public class UserForResultDto
 {
@@ -8,4 +10,5 @@ public class UserForResultDto
     public string UserName { get; set; }
     public string PasswordHash { get; set; }
     public string Email { get; set; }
+    public List<TestForResultDto> Tests { get; set; }
 }

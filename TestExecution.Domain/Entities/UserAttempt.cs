@@ -11,9 +11,9 @@ public class UserAttempt : Auditable
     public Guid TestId { get; set; }
     [ForeignKey(nameof(TestId))]
     public Test Test { get; set; }
+    public int RightAnswersCount { get; set; } = 0;
     public DateTime StartedAt { get; set; }
     public DateTime CompletedAt { get; set; }
-
     public ICollection<UserAnswer> UserAnswers { get; set; }
 
 }

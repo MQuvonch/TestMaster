@@ -12,8 +12,8 @@ using TestExecution.Data.Contexts;
 namespace TestExecution.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250224053601_AddedEntities")]
-    partial class AddedEntities
+    [Migration("20250305152942_AddedEntitys")]
+    partial class AddedEntitys
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -233,6 +233,9 @@ namespace TestExecution.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("RightAnswersCount")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -257,7 +260,7 @@ namespace TestExecution.Data.Migrations
             modelBuilder.Entity("TestExecution.Domain.Entities.Option", b =>
                 {
                     b.HasOne("TestExecution.Domain.Entities.Question", "Question")
-                        .WithMany("OPtions")
+                        .WithMany("Options")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
@@ -335,7 +338,7 @@ namespace TestExecution.Data.Migrations
 
             modelBuilder.Entity("TestExecution.Domain.Entities.Question", b =>
                 {
-                    b.Navigation("OPtions");
+                    b.Navigation("Options");
                 });
 
             modelBuilder.Entity("TestExecution.Domain.Entities.Test", b =>

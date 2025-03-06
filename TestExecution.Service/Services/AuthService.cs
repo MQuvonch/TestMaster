@@ -36,7 +36,7 @@ namespace TestExecution.Service.Services
 
         public async Task<LoginForResultDto> AuthenticateAsync(LoginDto loginDto)
         {
-            var users = await _userRepository.GetAllAsync();
+            var users =  _userRepository.GetAll();
             var filtereUser = users.Where(x => x.Email == loginDto.Email).FirstOrDefault();
 
             if (filtereUser != null)

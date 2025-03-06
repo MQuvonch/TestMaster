@@ -12,5 +12,5 @@ public class Test : Auditable
     public string Description { get; set; }
     public DateTime? Duration { get; set; }
 
-    public ICollection<Question> Questions { get; set; }
+    public List<Question> Questions { get; set; }
 }

@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using TestExecution.Data.IRepositories;
 using TestExecution.Domain.Entities;
+using TestExecution.Service.DTOs.Option;
+using TestExecution.Service.DTOs.Question;
 using TestExecution.Service.DTOs.Test;
 using TestExecution.Service.Exceptions;
 using TestExecution.Service.Interfaces;
@@ -43,10 +46,26 @@ public class TestService : ITestService
 
     public async Task<IEnumerable<TestForResultDto>> GetAllAsync()
     {
-        var tests = await _testRepository.GetAllAsync();
-        if (tests is null)
-            throw new TestCustomException(404, "Test tuplamda teslar mavjud emas");
-        return _mapper.Map<IEnumerable<TestForResultDto>>(tests);
+        var customTest = await _testRepository.GetAll().Select(item => new TestForResultDto
+        {
+            Id = item.Id,
+            Questions = item.Questions.Select(a => new QuestionFromResultDto
+            {
+                Id = a.Id,
+                Text = a.Text,
+                Options = a.Options.Select(o=>new OptionFromResultDto
+                {
+                    QuestionId = o.QuestionId,
+                    Text = o.Text,
+                    IsCorrect = o.IsCorrect
+                }).ToList()
+            }).ToList(),
+            Title = item.Title,
+            Description = item.Description,
+            Duration = item.Duration,
+        }).ToListAsync();
+
+        return customTest ?? throw new TestCustomException(404, "Test tuplamda teslar mavjud emas");
     }
 
     public async Task<TestForResultDto> GetByIdAsync(Guid Id)
@@ -54,6 +73,25 @@ public class TestService : ITestService
         var test = await _testRepository.GetByIdAsync(Id);
         if (test is null)
             throw new TestCustomException(404, "test mavjud emas");
+
+        var testDto = new TestForResultDto
+        {
+            Id = test.Id,
+            Description = test.Description,
+            Duration = test.Duration,
+            Title = test.Title,
+            Questions = test.Questions.Select(q => new QuestionFromResultDto
+            {
+                Id = q.Id,
+                Text = q.Text,
+                Options = q.Options.Select(o => new OptionFromResultDto
+                {
+                    QuestionId = o.QuestionId,
+                    Text = o.Text,
+                    IsCorrect = o.IsCorrect
+                }).ToList(),
+            }).ToList(),
+        };
 
         return _mapper.Map<TestForResultDto>(test);
     }
@@ -63,7 +101,7 @@ public class TestService : ITestService
         if (test is null)
             throw new TestCustomException(404, "test mavjud emas");
 
-        var mapTest = _mapper.Map(dto,test);
+        var mapTest = _mapper.Map(dto, test);
 
         var updateTest = await _testRepository.UpdateAsync(mapTest);
 

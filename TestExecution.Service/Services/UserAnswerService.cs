@@ -57,18 +57,28 @@ public class UserAnswerService : IUserAnswerService
         return _mapper.Map<UserAnswerFromResultDto>(createAnswer);
     }
 
-    public Task<UserAnswerFromResultDto> UpdateAsync(Guid Id, UserAnswerFromUpdateDto dto)
+    public async Task<UserAnswerFromResultDto> UpdateAsync(Guid Id, UserAnswerFromUpdateDto dto)
     {
-        throw new NotImplementedException();
+        var answer = await _answerRepository.GetByIdAsync(Id);
+        if (answer is null)
+            throw new TestCustomException(404, "bu javob mavjud emas");
+
+        var answerMap = _mapper.Map(dto, answer);
+        var updateAnswer = await _answerRepository.UpdateAsync(answerMap);
+
+
+        return _mapper.Map<UserAnswerFromResultDto>(updateAnswer);
+
     }
 
-    public Task<bool> DeleteAsync(Guid Id)
+    public async Task<bool> DeleteAsync(Guid Id)
     {
-        throw new NotImplementedException();
+        var answer = await _answerRepository.GetByIdAsync(Id);
+        if (answer is null)
+            throw new TestCustomException(404, "bu javob mavjud emas");
+
+        await _answerRepository.DeleteAsync(Id);
+        return true;
     }
 
-    public Task<string> FinishTest(SubmitTestCreationDto dto)
-    {
-        throw new NotImplementedException();
-    }
 }

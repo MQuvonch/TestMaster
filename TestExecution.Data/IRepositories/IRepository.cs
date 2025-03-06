@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TestExecution.Data.IRepositories
+﻿namespace TestExecution.Data.IRepositories
 {
     public interface IRepository<T>
     {
@@ -12,7 +6,6 @@ namespace TestExecution.Data.IRepositories
         Task<T> UpdateAsync(T entity);
         Task<bool> DeleteAsync(Guid id);
         Task<T> GetByIdAsync(Guid id);
-        Task<IEnumerable<T>> GetAllAsync();
-        
+        IQueryable<T> GetAll();
     }
 }

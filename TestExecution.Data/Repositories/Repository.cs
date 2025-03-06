@@ -39,9 +39,9 @@ namespace TestExecution.Data.Repositories
             return true;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public IQueryable<T> GetAll()
         {
-            var result =  _context.Set<T>().Where(x=>x.IsDeleted == false).AsEnumerable();
+            var result =  _context.Set<T>().Where(x=>x.IsDeleted == false).AsQueryable();
             return result;
         }
 

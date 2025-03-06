@@ -22,6 +22,7 @@ namespace TestExecution.Api.Extensions
             Services.AddScoped<IQuestionService, QuestionService>();
             Services.AddScoped<IOptionService, OptionService>();    
             Services.AddScoped<IUserAttemptService, UserAttemptService>();
+            Services.AddScoped<IUserAnswerService, UserAnswerService>();
 
             Services.AddHttpContextAccessor();
             Services.AddHttpClient();

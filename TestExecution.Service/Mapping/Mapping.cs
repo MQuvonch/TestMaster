@@ -19,7 +19,9 @@ public class Mapping : Profile
         //Test
         CreateMap<Test, TestForCreateDto>().ReverseMap();
         CreateMap<Test, TestForUpdateDto>().ReverseMap();
-        CreateMap<Test, TestForResultDto>().ReverseMap();
+        CreateMap<Test, TestForResultDto>()
+            .ForMember(dest=>dest.Questions,opt=>opt.MapFrom(src=>src.Questions));
+
 
         //Question
         CreateMap<Question, QuestionFromCreateDto>().ReverseMap();
@@ -34,6 +36,11 @@ public class Mapping : Profile
         //UserAttempt
         CreateMap<UserAttempt,UserAttemptFromCreateDto>().ReverseMap();
         CreateMap<UserAttempt,UserAttemptFromUpdateDto>().ReverseMap();
-        CreateMap<UserAttempt, UserAttemptFromResultDto>().ReverseMap();    
+        CreateMap<UserAttempt, UserAttemptFromResultDto>().ReverseMap();
+
+        //UserAnswer
+        CreateMap<UserAnswer, UserAttemptFromCreateDto>().ReverseMap();
+        CreateMap<UserAnswer, UserAttemptFromUpdateDto>().ReverseMap();
+        CreateMap<UserAnswer, UserAttemptFromResultDto>().ReverseMap();
     }
 }
