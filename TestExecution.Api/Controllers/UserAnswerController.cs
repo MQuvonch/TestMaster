@@ -24,7 +24,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _answerService.GetAllAsync()
+                Data = await _answerService.GetAllAsync()
             };
             return Ok(response);
         }
@@ -36,22 +36,11 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _answerService.GetByIdAsync(id)
+                Data = await _answerService.GetByIdAsync(id)
             };
             return Ok(response);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateAsync(UserAnswerFromCreateDto dto)
-        {
-            var response = new Response()
-            {
-                StatusCode = 200,
-                Message = "Success",
-                Date = await _answerService.CreateAsync(dto)
-            };
-            return Ok(response);
-        }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync(Guid id, UserAnswerFromUpdateDto dto)
@@ -60,7 +49,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _answerService.UpdateAsync(id, dto)
+                Data = await _answerService.UpdateAsync(id, dto)
             };
             return Ok(response);
         }
@@ -72,7 +61,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _answerService.DeleteAsync(id)
+                Data = await _answerService.DeleteAsync(id)
             };
             return Ok(response);
         }

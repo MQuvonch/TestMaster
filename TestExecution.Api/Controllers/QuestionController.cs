@@ -24,30 +24,30 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _questionService.GetByIdAsync(id)
+                Data = await _questionService.GetByIdAsync(id)
             };
             return Ok(response);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync(Guid testId)
         {
             var response = new Response()
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _questionService.GetAllAsync()
+                Data = await _questionService.GetAllAsync(testId)
             };
             return Ok(response);
         }
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] QuestionFromCreateDto dto)
+        public async Task<IActionResult> CreateAsync([FromBody] QuestionRangeCreateDto dto)
         {
             var response = new Response()
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _questionService.CreateAsync(dto),
+                Data = await _questionService.CreateRangeAsync(dto),
             };
             return Ok(response);
         }
@@ -59,7 +59,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _questionService.UpdateAsync(id, dto),
+                Data = await _questionService.UpdateAsync(id, dto),
             };
             return Ok(response);
         }
@@ -70,7 +70,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _questionService.DeleteAsync(id)
+                Data = await _questionService.DeleteAsync(id)
             };
             return Ok(response);
         }

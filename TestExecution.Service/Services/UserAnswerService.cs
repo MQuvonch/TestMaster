@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using TestExecution.Data.Contexts;
 using TestExecution.Data.IRepositories;
 using TestExecution.Domain.Entities;
 using TestExecution.Service.DTOs.UserAnswer;
+using TestExecution.Service.DTOs.UserAttempt;
 using TestExecution.Service.Exceptions;
 using TestExecution.Service.Interfaces;
 
@@ -13,6 +15,7 @@ public class UserAnswerService : IUserAnswerService
     private readonly IRepository<Question> _questionRepository;
     private readonly IRepository<Option> _optionRepository;
     private readonly IRepository<UserAttempt> _attemptRepository;
+    private readonly AppDbContext _context;
     private readonly IRepository<Test> _testRepository;
     private readonly IMapper _mapper;
 
@@ -21,7 +24,8 @@ public class UserAnswerService : IUserAnswerService
                              IRepository<Option> optionRepository,
                              IRepository<UserAttempt> attemptRepository,
                              IMapper mapper,
-                             IRepository<Test> testRepository)
+                             IRepository<Test> testRepository,
+                             AppDbContext context)
     {
         _answerRepository = answerRepository;
         _questionRepository = questionRepository;
@@ -29,6 +33,7 @@ public class UserAnswerService : IUserAnswerService
         _attemptRepository = attemptRepository;
         _mapper = mapper;
         _testRepository = testRepository;
+        _context = context;
     }
 
 
@@ -42,19 +47,44 @@ public class UserAnswerService : IUserAnswerService
         throw new NotImplementedException();
     }
 
-    public async Task<UserAnswerFromResultDto> CreateAsync(UserAnswerFromCreateDto dto)
+    public async Task<Guid> CreateAsync(UserAttemptFromCreateDto dto,Guid AttemptId, List<Guid> correctAnswersIds)
     {
-        var question = await _questionRepository.GetByIdAsync(dto.QuestionId);
-        var option = await _questionRepository.GetByIdAsync(dto.OptionId);
-        var attempt = await _questionRepository.GetByIdAsync(dto.UserAttemptId);
+        var Attempt = _attemptRepository.GetAll().Where(x => x.Id == AttemptId);
+        if ((!Attempt.Any()))
+            throw new Exception("urinish mavjud emas");
 
-        if (question is null && option is null && attempt is null)
-            throw new TestCustomException(404, "Javobi uchun savol yoki javob yoki urunishlari mavjud emas");
+        using (var transaction = await _context.Database.BeginTransactionAsync())
+        {
 
-        var answerMap = _mapper.Map<UserAnswer>(dto);
-        var createAnswer = await _answerRepository.CreateAsync(answerMap);
+            try
+            {
+                foreach (var respone in dto.Responses)
+                {
+                    foreach (var correctId in correctAnswersIds)
+                    {
+                        if (correctId == respone.OptionId)
+                        {
+                            await _answerRepository.CreateAsync(new()
+                            {
+                                QuestionId = respone.QuestionId,
+                                OptionId = respone.OptionId,
+                                AnsweredAt = respone.AnsweredAt,
+                                UserAttemptId = AttemptId,
+                            });
+                        }
+                    }
 
-        return _mapper.Map<UserAnswerFromResultDto>(createAnswer);
+                }
+               await transaction.CommitAsync();   
+                return AttemptId;
+            }
+            catch (Exception)
+            {
+               await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
     }
 
     public async Task<UserAnswerFromResultDto> UpdateAsync(Guid Id, UserAnswerFromUpdateDto dto)

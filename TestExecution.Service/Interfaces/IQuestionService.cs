@@ -5,9 +5,9 @@ namespace TestExecution.Service.Interfaces;
 
 public interface IQuestionService
 {
-    Task<IEnumerable<QuestionFromResultDto>> GetAllAsync();
+    Task<IEnumerable<QuestionFromResultDto>> GetAllAsync(Guid testId);
     Task<QuestionFromResultDto> GetByIdAsync(Guid Id);
-    Task<QuestionFromResultDto> CreateAsync(QuestionFromCreateDto dto);
+    Task<Guid> CreateRangeAsync(QuestionRangeCreateDto dto);
     Task<QuestionFromResultDto> UpdateAsync(Guid Id, QuestionFromUpdateDto dto);
     Task<bool> DeleteAsync(Guid Id);
 }

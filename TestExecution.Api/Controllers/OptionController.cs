@@ -24,7 +24,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _optionService.GetByIdAsync(id)
+                Data = await _optionService.GetByIdAsync(id)
             };
             return Ok(repsonse);    
         }
@@ -35,7 +35,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _optionService.GetAllAsync()
+                Data = await _optionService.GetAllAsync()
             };
             return Ok(response);
         }
@@ -47,7 +47,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _optionService.CreateAsync(dto)
+                Data = await _optionService.CreateAsync(dto)
             };
             return Ok(repsonse);
         }
@@ -58,7 +58,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _optionService.UpdateAsync(id, dto)
+                Data = await _optionService.UpdateAsync(id, dto)
             };
             return Ok(repsonse);
         }
@@ -70,7 +70,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _optionService.DeleteAsync(id)
+                Data = await _optionService.DeleteAsync(id)
             };
             return Ok(response);
         }

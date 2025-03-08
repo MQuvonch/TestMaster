@@ -34,7 +34,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Seccess",
-                Date = await _userService.RegistrAsync(dto)
+                Data = await _userService.RegistrAsync(dto)
             };
             return Ok(response);
         }

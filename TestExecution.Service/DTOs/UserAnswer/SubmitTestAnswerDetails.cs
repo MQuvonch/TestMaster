@@ -2,6 +2,5 @@
 {
     public class SubmitTestAnswerDetails
     {
-        public Guid OptionId { get; set; }  
     }
 }

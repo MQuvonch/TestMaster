@@ -19,12 +19,10 @@ public class Mapping : Profile
         //Test
         CreateMap<Test, TestForCreateDto>().ReverseMap();
         CreateMap<Test, TestForUpdateDto>().ReverseMap();
-        CreateMap<Test, TestForResultDto>()
-            .ForMember(dest=>dest.Questions,opt=>opt.MapFrom(src=>src.Questions));
+        CreateMap<Test, TestForResultDto>().ReverseMap();
 
 
         //Question
-        CreateMap<Question, QuestionFromCreateDto>().ReverseMap();
         CreateMap<Question, QuestionFromUpdateDto>().ReverseMap();
         CreateMap<Question, QuestionFromResultDto>().ReverseMap();
 

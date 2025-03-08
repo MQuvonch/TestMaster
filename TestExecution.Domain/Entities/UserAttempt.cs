@@ -12,6 +12,7 @@ public class UserAttempt : Auditable
     [ForeignKey(nameof(TestId))]
     public Test Test { get; set; }
     public int RightAnswersCount { get; set; } = 0;
+    public int IsCurrectAnswerCount {  get; set; } = 0; 
     public DateTime StartedAt { get; set; }
     public DateTime CompletedAt { get; set; }
     public ICollection<UserAnswer> UserAnswers { get; set; }

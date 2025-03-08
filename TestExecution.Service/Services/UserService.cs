@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using TestExecution.Data.IRepositories;
 using TestExecution.Domain.Entities;
 using TestExecution.Service.DTOs.Option;
@@ -51,7 +52,7 @@ public class UserService : IUserService
 
     public async Task<IEnumerable<UserForResultDto>> GetAllAsync()
     {
-        var users = _repository.GetAll().Select(u=>new UserForResultDto
+        var users = _repository.GetAll().Select(u => new UserForResultDto
         {
             Id = u.Id,
             FirstName = u.FirstName,
@@ -61,21 +62,9 @@ public class UserService : IUserService
             PasswordHash = u.PasswordHash,
             Tests = u.Tests.Select(t=> new TestForResultDto
             {
-                Id=t.Id,
                 Title = t.Title,    
                 Description = t.Description,
                 Duration = t.Duration,
-                Questions = t.Questions.Select(q=>new QuestionFromResultDto
-                {
-                    Id=q.Id,    
-                    Text=q.Text,    
-                    Options = q.Options.Select(o=> new OptionFromResultDto
-                    {
-                        QuestionId=o.Id,
-                        Text = o.Text,
-                        IsCorrect=o.IsCorrect,
-                    }).ToList()
-                }).ToList() 
             }).ToList()
         });
         return users ?? throw new TestCustomException(404, "User mavjud emas"); ;
@@ -83,12 +72,28 @@ public class UserService : IUserService
 
     public async Task<UserForResultDto> GetByIdAsync(Guid Id)
     {
-        var user = await _repository.GetByIdAsync(Id);
-        if (user is null)
-            throw new TestCustomException(404, "User topilmadi ");
+        var user = _repository.GetAll().Include(t=>t.Tests).ThenInclude(q=>q.Questions).ThenInclude(o=>o.Options)
+            .Where(x=>x.Id == Id).FirstOrDefault();
+
+        var userDto = new UserForResultDto()
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            UserName = user.UserName,
+            Email = user.Email,
+            PasswordHash = user.PasswordHash,
+            Tests = user.Tests.Select(t => new TestForResultDto
+            {
+                Id = t.Id,
+                Title = t.Title,
+                Description = t.Description,
+                Duration = t.Duration,
+            }).ToList()
+        };
 
 
-        return _mapper.Map<UserForResultDto>(user); ;
+        return userDto;
     }
 
     public async Task<UserForResultDto> UpdateAsync(Guid Id, UserForUpdateDto dto)

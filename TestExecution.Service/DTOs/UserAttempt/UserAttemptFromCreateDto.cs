@@ -7,6 +7,6 @@ public class UserAttemptFromCreateDto
 {
     public Guid TestId { get; set; }
     public DateTime StartedAt { get; set; }
-    public DateTime CompletedAt { get; set; }
-    public List<SubmitTestAnswerDetails> Details { get; set; }
+    public List<UserAnswerRangeCreateDto> Responses { get; set; }
 }
+

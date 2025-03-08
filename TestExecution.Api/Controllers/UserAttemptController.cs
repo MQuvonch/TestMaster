@@ -7,7 +7,7 @@ using TestExecution.Service.Interfaces;
 
 namespace TestExecution.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize]
     public class UserAttemptController : ControllerBase
@@ -26,30 +26,30 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _userAttemptService.GetByIdAsync(id)
+                Data = await _userAttemptService.GetByIdAsync(id)
             };
             return Ok(response);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync(Guid testId)
         {
             var response = new Response()
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _userAttemptService.GetAllAsync()
+                Data = await _userAttemptService.GetAllAsync(testId)
             };
             return Ok(response);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] UserAttemptFromCreateDto dto)
+        public async Task<IActionResult> FinishTest([FromBody] UserAttemptFromCreateDto dto)
         {
             var response = new Response()
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _userAttemptService.FinishTest(dto)
+                Data = await _userAttemptService.FinishTest(dto)
             };
             return Ok(response);
         }
@@ -61,7 +61,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _userAttemptService.UpdateAsync(id, dto)
+                Data = await _userAttemptService.UpdateAsync(id, dto)
             };
             return Ok(response);
         }
@@ -73,7 +73,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _userAttemptService.DeleteAsync(id)
+                Data = await _userAttemptService.DeleteAsync(id)
             };
             return Ok(response);
         }

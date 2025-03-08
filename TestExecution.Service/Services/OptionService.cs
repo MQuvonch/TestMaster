@@ -24,10 +24,6 @@ namespace TestExecution.Service.Services
 
         public async Task<OptionFromResultDto> CreateAsync(OptionFromCreateDto dto)
         {
-            var question = await _questionRepository.GetByIdAsync(dto.QuestionId);
-            if (question is null)
-                throw new TestCustomException(404, "Savol mavjud emas");
-
             var optionMap = _mapper.Map<Option>(dto);
             var createOption = await _optionRepository.CreateAsync(optionMap);
             return _mapper.Map<OptionFromResultDto>(createOption);
@@ -70,7 +66,7 @@ namespace TestExecution.Service.Services
                 IsCorrect = option.IsCorrect,
             };
 
-            return optionDto;
+            return optionDto;   
         }
 
         public async Task<OptionFromResultDto> UpdateAsync(Guid Id, OptionFromUpdateDto dto)

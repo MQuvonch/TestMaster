@@ -25,7 +25,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _testService.GetByIdAsync(id)
+                Data = await _testService.GetByIdAsync(id)
             };
             return Ok(response);
         }
@@ -36,7 +36,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _testService.GetAllAsync()
+                Data = await _testService.GetAllAsync()
             };
             return Ok(response);
         }
@@ -47,7 +47,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _testService.CreateAsync(dto)
+                Data = await _testService.CreateAsync(dto)
             };
             return Ok(response);
         }
@@ -58,7 +58,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _testService.UpdateAsync(id, dto)
+                Data = await _testService.UpdateAsync(id, dto)
             };
             return Ok(response);
         }
@@ -69,7 +69,7 @@ namespace TestExecution.Api.Controllers
             {
                 StatusCode = 200,
                 Message = "Success",
-                Date = await _testService.DeleteAsync(id)
+                Data = await _testService.DeleteAsync(id)
             };
             return Ok(response);    
         }

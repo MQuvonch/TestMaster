@@ -13,6 +13,7 @@ public class UserAttemptService : IUserAttemptService
     public readonly IAuthService _authService;
     private readonly IRepository<Test> _testRepository;
     private readonly IRepository<Option> _optionRepository;
+    private readonly IUserAnswerService _userAnswerService;
     public readonly IMapper _mapper;
 
     public UserAttemptService(
@@ -20,37 +21,63 @@ public class UserAttemptService : IUserAttemptService
         IAuthService authService,
         IMapper mapper,
         IRepository<Test> testRepository,
-        IRepository<Option> optionRepository)
+        IRepository<Option> optionRepository,
+        IRepository<Question> questionRepository,
+        IUserAnswerService userAnswerService)
     {
         _attemptRepository = attemptRepository;
         _authService = authService;
         _mapper = mapper;
         _testRepository = testRepository;
         _optionRepository = optionRepository;
+        _userAnswerService = userAnswerService;
     }
 
     public async Task<UserAttemptFromResultDto> FinishTest(UserAttemptFromCreateDto dto)
     {
-        var test = _testRepository.GetByIdAsync(dto.TestId);
+        var test = await _testRepository.GetByIdAsync(dto.TestId);
         if (test is null)
             throw new TestCustomException(404, "Test mavjud emas ");
 
         int correctAnswersCount = 0;
-        foreach (var option in dto.Details)
+        int isCorrectAnswersCount = 0;
+        List<Guid> correctAnswersIds = new List<Guid>();
+        foreach (var response in dto.Responses)
         {
-            var myOpton = await _optionRepository.GetByIdAsync(option.OptionId);
-            if (option is null)
+            var myOption = await _optionRepository.GetByIdAsync(response.OptionId);
+            if (response is null)
                 throw new TestCustomException(404, "bunday variant mavjud emas");
-            if (myOpton.IsCorrect)
+            if (myOption.IsCorrect)
+            {
+                correctAnswersIds.Add(myOption.Id);
                 correctAnswersCount++;
+            }
         }
+        var userId = _authService.TokenFromUserId();
 
-        var mapUserAttempt = _mapper.Map<UserAttempt>(dto);
-        mapUserAttempt.UserId = _authService.TokenFromUserId();
-        mapUserAttempt.RightAnswersCount = correctAnswersCount;
+        var attempt = new UserAttempt
+        {
+            TestId = dto.TestId,
+            RightAnswersCount = correctAnswersCount,
+            IsCurrectAnswerCount = isCorrectAnswersCount,
+            CompletedAt = DateTime.UtcNow,
+            UserId = userId,
+            StartedAt = dto.StartedAt,
+        };
+        var createUserAttempt = await _attemptRepository.CreateAsync(attempt);
 
-        var createUserAttempt = await _attemptRepository.CreateAsync(mapUserAttempt);
-        return _mapper.Map<UserAttemptFromResultDto>(createUserAttempt);
+        Guid AttemptId = createUserAttempt.Id;
+
+        var createAnswer = await _userAnswerService.CreateAsync(dto, AttemptId, correctAnswersIds);
+
+        return new UserAttemptFromResultDto
+        {
+            CompletedAt = createUserAttempt.CompletedAt,
+            CorrectAnswersCount = correctAnswersCount,
+            IsCorrectAnswersCount = isCorrectAnswersCount,
+            StartedAt = createUserAttempt.StartedAt,
+            TestId = createUserAttempt.TestId,
+        };
     }
 
     public async Task<bool> DeleteAsync(Guid Id)
@@ -63,9 +90,9 @@ public class UserAttemptService : IUserAttemptService
         return true;
     }
 
-    public async Task<IEnumerable<UserAttemptFromResultDto>> GetAllAsync()
+    public async Task<IEnumerable<UserAttemptFromResultDto>> GetAllAsync(Guid TestId)
     {
-        var userAttempts = _attemptRepository.GetAll();
+        var userAttempts = _attemptRepository.GetAll().Where(x => x.Id == TestId);
         if (userAttempts is null)
             throw new TestCustomException(404, "urunishlar mavjud emas ");
 

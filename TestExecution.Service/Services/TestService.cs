@@ -49,17 +49,6 @@ public class TestService : ITestService
         var customTest = await _testRepository.GetAll().Select(item => new TestForResultDto
         {
             Id = item.Id,
-            Questions = item.Questions.Select(a => new QuestionFromResultDto
-            {
-                Id = a.Id,
-                Text = a.Text,
-                Options = a.Options.Select(o=>new OptionFromResultDto
-                {
-                    QuestionId = o.QuestionId,
-                    Text = o.Text,
-                    IsCorrect = o.IsCorrect
-                }).ToList()
-            }).ToList(),
             Title = item.Title,
             Description = item.Description,
             Duration = item.Duration,
@@ -70,9 +59,10 @@ public class TestService : ITestService
 
     public async Task<TestForResultDto> GetByIdAsync(Guid Id)
     {
-        var test = await _testRepository.GetByIdAsync(Id);
+        var test =  _testRepository.GetAll().Include(q=>q.Questions).ThenInclude(o=>o.Options)
+            .Where(x=>x.Id == Id).FirstOrDefault();
         if (test is null)
-            throw new TestCustomException(404, "test mavjud emas");
+            throw new TestCustomException(404, "Test mavjud emas");
 
         var testDto = new TestForResultDto
         {
@@ -80,20 +70,9 @@ public class TestService : ITestService
             Description = test.Description,
             Duration = test.Duration,
             Title = test.Title,
-            Questions = test.Questions.Select(q => new QuestionFromResultDto
-            {
-                Id = q.Id,
-                Text = q.Text,
-                Options = q.Options.Select(o => new OptionFromResultDto
-                {
-                    QuestionId = o.QuestionId,
-                    Text = o.Text,
-                    IsCorrect = o.IsCorrect
-                }).ToList(),
-            }).ToList(),
         };
 
-        return _mapper.Map<TestForResultDto>(test);
+        return testDto;
     }
     public async Task<TestForResultDto> UpdateAsync(Guid Id, TestForUpdateDto dto)
     {

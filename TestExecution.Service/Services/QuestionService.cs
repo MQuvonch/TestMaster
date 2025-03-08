@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using TestExecution.Data.Contexts;
 using TestExecution.Data.IRepositories;
 using TestExecution.Domain.Entities;
 using TestExecution.Service.DTOs.Option;
@@ -12,29 +14,68 @@ public class QuestionService : IQuestionService
 {
     private readonly IRepository<Question> _questionRepository;
     private readonly IRepository<Test> _testRepository;
+    private readonly IRepository<Option> _optionRepository;
+    private readonly AppDbContext _context;
     private readonly IMapper _mapper;
 
     public QuestionService(IRepository<Question> questionRepository,
                            IMapper mapper,
-                           IRepository<Test> testRepository)
+                           IRepository<Test> testRepository,
+                           IRepository<Option> optionRepository,
+                           AppDbContext context)
     {
         _questionRepository = questionRepository;
         _mapper = mapper;
         _testRepository = testRepository;
+        _optionRepository = optionRepository;
+        _context = context;
     }
 
-    public async Task<QuestionFromResultDto> CreateAsync(QuestionFromCreateDto dto)
+    public async Task<Guid> CreateRangeAsync(QuestionRangeCreateDto dto)
     {
-        var tests =  _testRepository.GetAll();
-        var test = tests.Where(t => t.Id == dto.TestId).FirstOrDefault();
-        if (test is null)
-            throw new TestCustomException(404, "test mavjud emas");
+        if (!(await _context.Tests.AnyAsync(x => x.Id == dto.TestId)))
+            throw new Exception("Bunday test mavjud emas");
 
-        var questionMap = _mapper.Map<Question>(dto);
-        var createQuestion = await _questionRepository.CreateAsync(questionMap);
+        using (var transaction = await _context.Database.BeginTransactionAsync())
+        {
+            try
+            {
+                foreach (var question in dto.Questions)
+                {
+                    var newQuestion = await _questionRepository.CreateAsync(new()
+                    {
+                        TestId = dto.TestId,
+                        Text = question.Text,
+                    });
 
-        return _mapper.Map<QuestionFromResultDto>(createQuestion);
+                    bool hasOneCorrectOption = question.Options.Count(o => o.IsCorrect) == 1;
+                    if (!hasOneCorrectOption)
+                        throw new Exception($"{question.Text} savolda tug'ri javob bitta emas");
+
+                    foreach (var option in question.Options)
+                    {
+                        await _optionRepository.CreateAsync(new Option()
+                        {
+                            QuestionId = newQuestion.Id,
+                            Text = option.Text,
+                            IsCorrect = option.IsCorrect,
+                        });
+                    }
+                }
+
+                await transaction.CommitAsync();
+
+                return dto.TestId;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        };
+
     }
+
 
     public async Task<bool> DeleteAsync(Guid Id)
     {
@@ -46,27 +87,30 @@ public class QuestionService : IQuestionService
         return true;
     }
 
-    public async Task<IEnumerable<QuestionFromResultDto>> GetAllAsync()
+    public async Task<IEnumerable<QuestionFromResultDto>> GetAllAsync(Guid testId)
     {
-        var questions = _questionRepository.GetAll().Select(q=>new QuestionFromResultDto
-        {
-            Id = q.Id,
-            Text = q.Text,
-            Options = q.Options.Select(o=>new OptionFromResultDto
-            {
-                QuestionId = o.QuestionId,
-                Text = o.Text,
-                IsCorrect = o.IsCorrect,    
-            }).ToList()
-        });
-        return questions ?? throw new TestCustomException(404, "questions mavjud emas"); ;
+        var questions = _questionRepository.GetAll();
+
+        var filterQuestion = questions.Where(x => x.TestId == testId)
+          .Select(q => new QuestionFromResultDto
+          {
+              Id = q.Id,
+              Text = q.Text,
+              Options = q.Options.Select(o => new OptionFromResultDto
+              {
+                  QuestionId = o.QuestionId,
+                  Text = o.Text,
+              }).ToList()
+          });
+        return filterQuestion ?? throw new TestCustomException(404, "questions mavjud emas"); ;
     }
 
     public async Task<QuestionFromResultDto> GetByIdAsync(Guid Id)
     {
-        var question = await _questionRepository.GetByIdAsync(Id);
+        var question = _questionRepository.GetAll().Include(o => o.Options).
+            Where(x => x.Id == Id).FirstOrDefault();
         if (question is null)
-            throw new TestCustomException(404, "question mavjud emas ");
+            throw new TestCustomException(404, "question mavjud emas");
 
         var questionDto = new QuestionFromResultDto
         {
@@ -93,5 +137,10 @@ public class QuestionService : IQuestionService
         var updateQuestion = await _questionRepository.UpdateAsync(mapQuestion);
 
         return _mapper.Map<QuestionFromResultDto>(updateQuestion);
+    }
+
+    private bool CheckTestId(Question questions, Guid testId)
+    {
+        return questions.TestId == testId;
     }
 }
