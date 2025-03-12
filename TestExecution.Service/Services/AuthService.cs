@@ -1,15 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using TestExecution.Data.IRepositories;
 using TestExecution.Domain.Entities;
 using TestExecution.Service.DTOs.Login;
@@ -36,7 +30,7 @@ namespace TestExecution.Service.Services
 
         public async Task<LoginForResultDto> AuthenticateAsync(LoginDto loginDto)
         {
-            var users =  _userRepository.GetAll();
+            var users = _userRepository.GetAll();
             var filtereUser = users.Where(x => x.Email == loginDto.Email).FirstOrDefault();
 
             if (filtereUser != null)
@@ -61,11 +55,11 @@ namespace TestExecution.Service.Services
             if (user is null || !user.Identity.IsAuthenticated)
                 throw new TestCustomException(400, "Foydalanuvchi Authentication qilnmagan");
 
-            var idClaim = user.Claims.Where(claim=>claim.Type == "Id").FirstOrDefault()?.Value;
+            var idClaim = user.Claims.Where(claim => claim.Type == "Id").FirstOrDefault()?.Value;
 
             if (string.IsNullOrEmpty(idClaim))
                 throw new TestCustomException(400, "Token ichida Id claim mavjuda emas");
-            return Guid.Parse(idClaim); 
+            return Guid.Parse(idClaim);
         }
 
         private string GenerateUserToken(User user)
@@ -76,9 +70,11 @@ namespace TestExecution.Service.Services
                 var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
                 var tokenDescription = new SecurityTokenDescriptor
                 {
+
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                    new Claim("Id",user.Id.ToString()),
+                        new Claim("Id",user.Id.ToString()),
+                        new Claim(ClaimTypes.Role, ((Roles)user.Role).ToString())
                     }),
                     Audience = _configuration["JWT:Audience"],
                     Issuer = _configuration["JWT:Issuer"],
@@ -95,7 +91,6 @@ namespace TestExecution.Service.Services
             }
             catch (Exception ex)
             {
-
                 throw new Exception(ex.Message);
             }
         }

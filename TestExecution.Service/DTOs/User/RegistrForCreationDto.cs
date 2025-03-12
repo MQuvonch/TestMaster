@@ -15,4 +15,5 @@ public class RegistrForCreationDto
     [Required()]
     [EmailAddress]
     public string Email { get; set; }
+    public int VerifyCode {  get; set; }    
 }

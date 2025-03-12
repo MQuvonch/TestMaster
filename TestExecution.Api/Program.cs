@@ -24,6 +24,9 @@ namespace TestExecution.Api
             builder.Services.AddSwaggerService();
             builder.Services.AddJwtService(builder.Configuration);
 
+
+            builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -41,7 +41,6 @@ public class UserAttemptService : IUserAttemptService
 
         int correctAnswersCount = 0;
         int isCorrectAnswersCount = 0;
-        List<Guid> correctAnswersIds = new List<Guid>();
         foreach (var response in dto.Responses)
         {
             var myOption = await _optionRepository.GetByIdAsync(response.OptionId);
@@ -49,7 +48,6 @@ public class UserAttemptService : IUserAttemptService
                 throw new TestCustomException(404, "bunday variant mavjud emas");
             if (myOption.IsCorrect)
             {
-                correctAnswersIds.Add(myOption.Id);
                 correctAnswersCount++;
             }
         }
@@ -68,7 +66,7 @@ public class UserAttemptService : IUserAttemptService
 
         Guid AttemptId = createUserAttempt.Id;
 
-        var createAnswer = await _userAnswerService.CreateAsync(dto, AttemptId, correctAnswersIds);
+        var createAnswer = await _userAnswerService.CreateAsync(dto, AttemptId);
 
         return new UserAttemptFromResultDto
         {

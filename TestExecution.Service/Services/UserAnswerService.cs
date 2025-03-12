@@ -37,8 +37,9 @@ public class UserAnswerService : IUserAnswerService
     }
 
 
-    public async Task<IEnumerable<UserAnswerFromResultDto>> GetAllAsync()
+    public async Task<IEnumerable<UserAnswerFromResultDto>> GetAllAsync(Guid TestId)
     {
+        var test = _answerRepository;
         throw new NotImplementedException();
     }
 
@@ -47,7 +48,7 @@ public class UserAnswerService : IUserAnswerService
         throw new NotImplementedException();
     }
 
-    public async Task<Guid> CreateAsync(UserAttemptFromCreateDto dto,Guid AttemptId, List<Guid> correctAnswersIds)
+    public async Task<Guid> CreateAsync(UserAttemptFromCreateDto dto, Guid AttemptId)
     {
         var Attempt = _attemptRepository.GetAll().Where(x => x.Id == AttemptId);
         if ((!Attempt.Any()))
@@ -60,27 +61,21 @@ public class UserAnswerService : IUserAnswerService
             {
                 foreach (var respone in dto.Responses)
                 {
-                    foreach (var correctId in correctAnswersIds)
-                    {
-                        if (correctId == respone.OptionId)
-                        {
-                            await _answerRepository.CreateAsync(new()
-                            {
-                                QuestionId = respone.QuestionId,
-                                OptionId = respone.OptionId,
-                                AnsweredAt = respone.AnsweredAt,
-                                UserAttemptId = AttemptId,
-                            });
-                        }
-                    }
 
+                    await _answerRepository.CreateAsync(new()
+                    {
+                        QuestionId = respone.QuestionId,
+                        OptionId = respone.OptionId,
+                        AnsweredAt = respone.AnsweredAt,
+                        UserAttemptId = AttemptId,
+                    });
                 }
-               await transaction.CommitAsync();   
+                await transaction.CommitAsync();
                 return AttemptId;
             }
             catch (Exception)
             {
-               await transaction.RollbackAsync();
+                await transaction.RollbackAsync();
                 throw;
             }
         }

@@ -12,8 +12,8 @@ using TestExecution.Data.Contexts;
 namespace TestExecution.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250308095555_AddedIsCurrectProp")]
-    partial class AddedIsCurrectProp
+    [Migration("20250312113521_AddedEntitys")]
+    partial class AddedEntitys
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -161,6 +161,9 @@ namespace TestExecution.Data.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

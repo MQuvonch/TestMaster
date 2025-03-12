@@ -8,6 +8,13 @@ public class User : Auditable
     public string UserName { get; set; }    
     public string PasswordHash { get; set; }
     public string Email { get; set; }
+    public int Role { get; set; }  
     public IEnumerable<Test> Tests { get; set; }
     public ICollection<UserAttempt> Attempts { get; set; }
+}
+
+public enum Roles
+{
+    User = 1,
+    Admin = 2
 }

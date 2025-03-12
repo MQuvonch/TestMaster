@@ -14,6 +14,5 @@ namespace TestExecution.Service.Interfaces
         Task<UserForResultDto> RegistrAsync(RegistrForCreationDto user);
         Task<UserForResultDto> UpdateAsync(Guid Id,UserForUpdateDto user);
         Task<bool> DeleteAsync(Guid Id);
-
     }
 }

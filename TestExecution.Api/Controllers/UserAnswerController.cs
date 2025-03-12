@@ -18,13 +18,13 @@ namespace TestExecution.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync(Guid testId)
         {
             var response = new Response()
             {
                 StatusCode = 200,
                 Message = "Success",
-                Data = await _answerService.GetAllAsync()
+                Data = await _answerService.GetAllAsync(testId)
             };
             return Ok(response);
         }

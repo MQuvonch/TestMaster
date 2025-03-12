@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using TestExecution.Data.IRepositories;
 using TestExecution.Domain.Entities;
 using TestExecution.Service.DTOs.Option;
@@ -15,31 +16,49 @@ namespace TestExecution.Service.Services;
 public class UserService : IUserService
 {
     private readonly IRepository<User> _repository;
+    private readonly IEmailService _emailService;
     private readonly IMapper _mapper;
+    private readonly IMemoryCache _memoryCache;
 
-    public UserService(IRepository<User> repository, IMapper mapper)
+    public UserService(IRepository<User> repository,
+                       IMapper mapper,
+                       IEmailService emailService,
+                       IMemoryCache memoryCache)
     {
         _repository = repository;
         _mapper = mapper;
+        _emailService = emailService;
+        _memoryCache = memoryCache;
     }
 
     public async Task<UserForResultDto> RegistrAsync(RegistrForCreationDto dto)
     {
         var users = _repository.GetAll();
         var filtereUser = users.Where(u => u.Email == dto.Email).FirstOrDefault();
-        if (filtereUser != null)
+        if (filtereUser is not null)
         {
             throw new TestCustomException(404, "foydalanuvchi mavjud");
         }
 
+       
+        bool verifyCheckCode = await _emailService.VerifyCodeAsync(dto.Email,dto.VerifyCode);
+
+        if (!verifyCheckCode)
+        {
+            throw new Exception("Bu foydalanuvchi Verify kodi vaqti utgan yoki u email mavjud emas ");
+        }
+
+
         var newUserDto = _mapper.Map<User>(dto);
         var GeneretedPasshwordHash = PasswordHelper.Hash(dto.PasswordHash);
         newUserDto.PasswordHash = GeneretedPasshwordHash;
-
+        newUserDto.Role = 1;
         var createUser = await _repository.CreateAsync(newUserDto);
+
 
         return _mapper.Map<UserForResultDto>(createUser);
     }
+
 
     public async Task<bool> DeleteAsync(Guid Id)
     {

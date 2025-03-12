@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,9 +46,8 @@ namespace TestExecution.Data.Contexts
                 .HasMany(x => x.Options)
                 .WithOne(t => t.Question)
                 .OnDelete(DeleteBehavior.SetNull);
-
-
-
         }
+
+
     }
 }

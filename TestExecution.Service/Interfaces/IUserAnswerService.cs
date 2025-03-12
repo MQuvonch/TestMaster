@@ -5,9 +5,9 @@ namespace TestExecution.Service.Interfaces
 {
     public interface IUserAnswerService
     {
-        Task<IEnumerable<UserAnswerFromResultDto>> GetAllAsync();
+        Task<IEnumerable<UserAnswerFromResultDto>> GetAllAsync(Guid TestId);
         Task<UserAnswerFromResultDto> GetByIdAsync(Guid Id);
-        Task<Guid> CreateAsync(UserAttemptFromCreateDto dto, Guid AttemptId,List<Guid> correctAnswersIds);
+        Task<Guid> CreateAsync(UserAttemptFromCreateDto dto, Guid AttemptId);
         Task<UserAnswerFromResultDto> UpdateAsync(Guid Id,  UserAnswerFromUpdateDto dto);
         Task<bool> DeleteAsync(Guid Id);
     } 
