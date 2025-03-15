@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using TestExecution.Data.IRepositories;
 using TestExecution.Domain.Entities;
-using TestExecution.Service.DTOs.Option;
-using TestExecution.Service.DTOs.Question;
 using TestExecution.Service.DTOs.Test;
 using TestExecution.Service.DTOs.User;
 using TestExecution.Service.Exceptions;

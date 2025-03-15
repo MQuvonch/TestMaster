@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.Design;
+﻿using Microsoft.AspNetCore.Mvc;
 using TestExecution.Api.Models;
 using TestExecution.Service.DTOs.Option;
 using TestExecution.Service.Interfaces;

@@ -37,8 +37,8 @@ public class EmailService : IEmailService
 
     public async Task<bool> VerifyCodeAsync(string email, int code)
     {
-        var cashedValue = _memoryCache.Get<string>(email);
-        if (cashedValue == code.ToString())
+        var cashedValue = _memoryCache.Get<int>(email);
+        if (cashedValue == code)
         {
             return true;
         }
