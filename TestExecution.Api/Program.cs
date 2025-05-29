@@ -17,7 +17,7 @@ namespace TestExecution.Api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            var connectionString = builder.Configuration.GetConnectionString("DefalutConnection");
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(connectionString));
             Console.WriteLine("--> CONNECTION String: " + connectionString);
