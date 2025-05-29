@@ -17,9 +17,10 @@ namespace TestExecution.Api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            var connectionString = builder.Configuration.GetConnectionString("DefalutConnection");
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefalutConnection")));
-
+                options.UseNpgsql(connectionString));
+            Console.WriteLine("--> CONNECTION String: " + connectionString);
             builder.Services.AddCustomExtension();
             builder.Services.AddSwaggerService();
             builder.Services.AddJwtService(builder.Configuration);
@@ -40,7 +41,14 @@ namespace TestExecution.Api
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
+            using(var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                if (context.Database.GetPendingMigrations().Any())
+                {
+                    context.Database.Migrate();
+                }
+            }
 
             app.MapControllers();
 
