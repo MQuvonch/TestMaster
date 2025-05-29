@@ -15,6 +15,6 @@ public class User : Auditable
 
 public enum Roles
 {
-    User = 1,
+    mentor = 1,
     Admin = 2
 }
